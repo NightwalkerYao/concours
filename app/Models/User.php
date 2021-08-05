@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'nom',
+        'prenom',
+        'date_naissance',
+        'email',
+        'password',
+        'motivation',
+        'photo',
+        'sexe_id',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function getFullNameAttribute()
+    {
+      return $this->nom.' '.$this->prenom;
+    }
+
+    public function getPhotoPathAttribute()
+    {
+      return asset(empty($this->photo) ? '/assets/media/users/blank.png' : str_replace('public/', '', 'storage/'.$this->photo));
+    }
+
+
+    public function modules()
+    {
+        return $this->belongsToMany(Module::class, 'module_user');
+    }
+
+    public function sexe()
+    {
+      return $this->belongsTo(Sexe::class);
+    }
+}
